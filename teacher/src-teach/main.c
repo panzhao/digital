@@ -19,21 +19,26 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error initial framebuffer\n");
 	return 1;
     }
-	
-    display_jpeg(argv[1], fb_inf);
-    sleep(1);
+
+    while (1)
+    {
+        display_jpeg(argv[1], fb_inf);
+        sleep(1);
            
-    display_jpeg_l_r("1.jpg", fb_inf);
-    sleep(1);
+        display_rand("1.jpg", fb_inf);
+        sleep(1);
 	
-    display_jpeg("2.jpg", fb_inf);
-    sleep(1);
+        display_circle("2.jpg", fb_inf);
+        sleep(1);
 	
-    display_jpeg_l_r("3.jpg", fb_inf);
-//    system("./mp3 2.mp3");
+        display_jpeg_l_r("3.jpg", fb_inf);
+       sleep(1);   
+     }
+     
+     //system("./mp3 2.mp3");
 	
 	
-#if 1
+#if 0
     /* Test mouse */
     test_mouse(fb_inf);
 
@@ -43,7 +48,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 	
-//    display_string("显示文字", 32, 400, fb_inf, 0xFF0000);
+    //display_string("显示文字", 32, 400, fb_inf, 0xFF0000);
 #endif
 
     munmap(fb_inf.fbmem, fb_inf.w * fb_inf.h * fb_inf.bpp / 8);

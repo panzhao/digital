@@ -91,7 +91,6 @@ int fb_pixel_row(fb_info fb_inf, int x, int y, int len, u32_t color)
 
 int fb_test(void)
 {
-
 	printf("Framebuffer Test\n");
 	
 	fb_info fb_inf;
@@ -111,7 +110,6 @@ int fb_test(void)
         //p2.x = 1280, p2.y = 200;
 	fb_pixel_row(fb_inf, 0, 200, 1280, 0xFF0000);
 	
-
 	munmap(fb_inf.fbmem, fb_inf.w * fb_inf.h * fb_inf.bpp / 8);
 	return 0;
 }
