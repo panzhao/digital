@@ -5,6 +5,7 @@ typedef unsigned char u8_t;
 typedef unsigned short u16_t;
 typedef unsigned int u32_t;
 
+/*定义用来存放framebuf信息的结构体*/
 typedef struct 
 {
 	int w;		        /* width */
@@ -13,8 +14,15 @@ typedef struct
 	u8_t *fbmem;
 }fb_info;
 
-/* ******************** fb.c ******************** */
+/*定义用来存放鼠标事件的结构体*/
+typedef struct 
+{
+    int x;
+    int y;
+    int button;
+}mouse_event_t;
 
+/* ******************** fb.c ******************** */
 /* initial framebuf */
 extern int init_fb(fb_info *fb_inf);
 
@@ -23,7 +31,6 @@ extern int fb_pixel(fb_info fb_inf, int x, int y, u32_t color);
 
 /* Framebuffer Test */
 int fb_test(void);
-
 /* ********************end of fb.c ******************** */
 
 
@@ -66,4 +73,12 @@ extern int create_jpeg(const char *filejpeg, const char *newfile, fb_info fb_inf
 /* use middle data file to display */
 extern int basic_disp(const char * filename, fb_info fb_inf);
 
+/*实现鼠标和图片的同步操作*/
+extern mouse_event_t mevent;
+
+extern int syn_disp_mouse(fb_info );
+extern void * operate_mouse(void *);
+extern int operate_display(fb_info);
+extern int display_photo(fb_info);
+/*结束实现鼠标和图片的同步操作*/
 #endif

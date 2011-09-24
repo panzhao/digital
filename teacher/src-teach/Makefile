@@ -9,8 +9,8 @@ target = $(TAR_DIR)main
 
 CC = gcc
 #CC = arm-linux-gcc
-CFLAGS = -Wall -g -c -I../jpeg-8/ -I../freetype-2.3.11/include
-LDFLAGS = -L../jpeg-8/.libs/ -ljpeg -L../freetype-2.3.11/objs/.libs -lfreetype
+CFLAGS = -Wall -g -c -I../jpeg-8/ -I../freetype-2.3.11/include -lpthread
+LDFLAGS = -L../jpeg-8/.libs/ -ljpeg -L../freetype-2.3.11/objs/.libs -lfreetype -lpthread
 
 all: $(target)
 

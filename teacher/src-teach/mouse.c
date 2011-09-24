@@ -13,13 +13,7 @@
 
 #include "common.h"
 
-/* ********** .h */
-typedef struct 
-{
-    int x;
-    int y;
-    int button;
-}mouse_event_t;
+
 		
 extern int mouse_open(char *device_name, int *fd);
 extern int mouse_parse(const u8_t *buf, mouse_event_t* mevent);
@@ -27,9 +21,7 @@ extern int mouse_parse(const u8_t *buf, mouse_event_t* mevent);
 extern int fb_restorecursor(fb_info fb_inf, int x, int y);
 extern int fb_drawcursor(fb_info fb_inf, int x, int y);
 extern int test_mouse(fb_info fb_inf);
-
 /* **************** end .h */
-
 
 #define C_WIDTH  10
 #define C_HEIGHT 17
@@ -63,6 +55,7 @@ static unsigned long save_cursor[C_WIDTH * C_HEIGHT];
 int test_mouse(fb_info fb_inf)
 {
     int mfd;
+    
     mouse_open(NULL, &mfd);
 
     int m_x = fb_inf.w / 2;
@@ -70,24 +63,24 @@ int test_mouse(fb_info fb_inf)
     fb_drawcursor(fb_inf, m_x, m_y);
 
     u8_t buf[8];
-    mouse_event_t mevent;
-
-    int i = 0;
-    for(i = 0; i < 1000; ++i)
+    //mouse_event_t mevent;
+    memset(&mevent, 0, sizeof(memset));
+    
+    while (1)
     {
         int n = read(mfd, buf, 8);
         if (n != -1)
 	{
              mouse_parse(buf,&mevent);
-             printf("dx:%d\tdy:%d\n", mevent.x, mevent.y);
-             printf("mx:%d\tmy:%d\n", m_x, m_y);
+             //printf("dx:%d\tdy:%d\n", mevent.x, mevent.y);
+             //printf("mx:%d\tmy:%d\n", m_x, m_y);
 
              fb_restorecursor(fb_inf, m_x, m_y);
 		
              m_x += mevent.x;
              m_y += mevent.y;
              fb_drawcursor(fb_inf, m_x, m_y);
-
+#if 0
              switch (mevent.button)
 	     {
                  case 1:
@@ -113,14 +106,23 @@ int test_mouse(fb_info fb_inf)
 		     break;
 		 }
 	     }
-         }
-		
-	 sleep(1);
+#endif
+        }
+	 
+	// sleep(1);
     }
     
     return 0;
 }
 
+/********************************************************************
+函    数:        mouse_open
+功    能:        打开鼠标设备
+传入参数:        device_name:要打开的设备名字
+                 fd:用来存放打开设备操作时的返回值
+传出参数:        fd:打开设备后返回的值存放在fd中
+返    回:        0:程序成功执行
+********************************************************************/
 int mouse_open(char *device_name, int *fd)
 {
     if (NULL == device_name)
@@ -138,11 +140,19 @@ int mouse_open(char *device_name, int *fd)
     return 0;
 }
 
+/********************************************************************
+函    数:       mouse_parse 
+功    能:       分析鼠标的动作
+传入参数:       buf
+传出参数:
+返    回:
+********************************************************************/
+
 int mouse_parse(const u8_t *buf, mouse_event_t* mevent)
 {
     switch(buf[0] & 0x7)
     {
-	case 1:   /* left */
+	case 1:                        /* left */
 	{
 	    mevent->button = 1;
 	    break;
@@ -248,13 +258,24 @@ static int fb_savecursor (fb_info fb_inf,int x,int y)
     return 0;
 }
 
+/********************************************************************
+函    数:       fb_drawcursor 
+功    能:       在framebuf中画鼠标的形状
+传入参数:       fb_inf : 存放缓冲区的结构体
+                x      : 图标的横位置
+		y      : 图标的纵坐标
+传出参数: 
+返    回:
+********************************************************************/
 int  fb_drawcursor(fb_info fb_inf, int x, int y)
 {
     int i,j;
     unsigned int color;
 
+    /*保存缓存区的形状在save_cursor*/
     fb_savecursor (fb_inf,x,y);
 
+    /*循环画出鼠标的形状*/
     for (j = 0;j < C_HEIGHT; j++)
     {
         for (i = 0; i < C_WIDTH; i++)
@@ -270,4 +291,3 @@ int  fb_drawcursor(fb_info fb_inf, int x, int y)
     
     return 0;
 }
-
