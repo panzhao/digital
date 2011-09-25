@@ -46,7 +46,7 @@ int display_jpeg(char *filename, fb_info fb_inf)
 	    fb_pixel(fb_inf, k, m, buf32[k + m * fb_inf.w]);
 	}
 	   
-	usleep(10000);
+//	usleep(10000);
         m--;
     }
 

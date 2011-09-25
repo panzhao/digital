@@ -111,16 +111,16 @@ int operate_display(fb_info fb_inf)
 int display_photo(fb_info fb_inf)
 {
     display_jpeg("0.jpg", fb_inf);
-    sleep(1);
-           
+    usleep(100);
+
     display_rand("1.jpg", fb_inf);
-    sleep(1);
+    usleep(100);
 	
     display_circle("2.jpg", fb_inf);
-    sleep(1);
+    usleep(100);
 	
     display_jpeg_l_r("3.jpg", fb_inf);
-    sleep(1);
+    usleep(100);
 
     return 0;
 }

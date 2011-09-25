@@ -1,15 +1,16 @@
 # 2010.2.22
 
-#DIR = ./out/
 #TAR_DIR = ./out/
+DIR = ./out/
 
 src = $(wildcard *.c)
-obj = $(patsubst %.c, $(DIR)%.o, $(src))
-target = $(TAR_DIR)main
+dir = $(notdir $(src))
+obj = $(patsubst %.c, $(DIR)%.o, $(dir))
+target = main
 
 CC = gcc
 #CC = arm-linux-gcc
-CFLAGS = -Wall -g -c -I../jpeg-8/ -I../freetype-2.3.11/include -lpthread
+CFLAGS = -Wall -g -c -I../jpeg-8/ -I../freetype-2.3.11/include
 LDFLAGS = -L../jpeg-8/.libs/ -ljpeg -L../freetype-2.3.11/objs/.libs -lfreetype -lpthread
 
 all: $(target)
@@ -25,6 +26,6 @@ clean:
 	-rm -f *~
 
 .PHONY: clean
-test:
-	@echo $(src)
-	@echo $(obj)
+#test:
+#	@echo $(src)
+#	@echo $(obj)
