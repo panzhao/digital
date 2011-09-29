@@ -58,7 +58,6 @@ int test_mouse(fb_info fb_inf)
 
 	u8_t buf[8];
 	mouse_event_t mevent;
-	memset(&mevent, 0, sizeof(mevent));
 	int mouse = 0;
 
 	while (1)
@@ -67,11 +66,11 @@ int test_mouse(fb_info fb_inf)
 		if (n != -1)
 		{
 			mouse_parse(buf,&mevent);
+//			printf("mx:%d\tmy:%d\n", m_x, m_y);
 			fb_restorecursor(fb_inf, m_x, m_y);
 			m_x += mevent.x;
 			m_y += mevent.y;
-			
-#if 1
+
 			if (m_x >= (fb_inf.w-C_WIDTH))
 			{
 				m_x = fb_inf.w-C_WIDTH;
@@ -88,46 +87,23 @@ int test_mouse(fb_info fb_inf)
 			{
 				m_y = 0;	
 			}
-#endif                  
-
-#if 0
-    			switch (mevent.button)
+		/*	if (m_x > 100 && m_x < 132 && m_y > 68 && m_y < 100) 
 			{
-				case 0:
-					if(mouse == 1)
-					{   
-						kill(getppid(), SIGUSR1);
-						mouse = 0;
-					}   
-					if (mouse == 2)
-					{   
-						kill(getppid(), SIGUSR2);
-						mouse = 0;
-					}   
-					if (mouse == 3)
-					{   
-						kill(0,SIGQUIT);
-						mouse = 0;
-					}   
-					break;
-				case 1:mouse = 1;break;
-				case 2:mouse = 2;break;
-				case 3:mouse = 3;break;
-				default:break;
-
+				string_color >> 2;	
 			}
-#endif			
+		*/
 			switch (mevent.button)
 			{
 				case 0:
-					if(mouse == 1)
+					if((mouse == 1) && (m_x >= 100) && (m_x <= 164) && (m_y >= 118) && (m_y <= 150))
 					{   
-						kill(getppid(), SIGUSR2);
+						kill(getppid(), SIGUSR1);
 						mouse = 0;
 					}   
 					if (mouse == 2)
 					{   
-						kill(getppid(), SIGUSR1);
+						kill(getppid(), SIGQUIT);
+						menu();
 						mouse = 0;
 					}   
 					if (mouse == 3)

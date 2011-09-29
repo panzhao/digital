@@ -61,6 +61,7 @@ int display_four(char *filename, fb_info fb_inf)
 #endif
 int display_line(char *filename, fb_info fb_inf)
 {
+
 	fb_info jpeg_inf;
 	
 	u8_t *buf24 = decode_jpeg(filename, &jpeg_inf);
@@ -72,16 +73,10 @@ int display_line(char *filename, fb_info fb_inf)
 	for(i = 0; i < fb_inf.h/2; ++i)
 	{
 		for (j = 0; j < fb_inf.w; ++j)
-		{       
-                        if (back_main(buf24, scale_buf, buf32, fb_inf) == 1)
-		        {
-		            return 0;
-		        }
-
+		{
 			fb_pixel(fb_inf, j, i, buf32[j + i * fb_inf.w]);
 			fb_pixel(fb_inf,j,fb_inf.h-i-1,buf32[j+(fb_inf.h-i-1)*(fb_inf.w)]);
 		}
-
 		usleep(900);
 	}
 #endif
@@ -123,14 +118,8 @@ int display_circle(char *filename, fb_info fb_inf)
 				a = (j-x)*(j-x)+(i-y)*(i-y);
 				b = r*r;
 				if(abs(a-b)<4*r)
-		                {
-                                    if(back_main(buf24, scale_buf, buf32, fb_inf) == 1)
-		       		    {
-		           		return 0;
-		       		    }
+					fb_pixel(fb_inf,j,i,buf32[j + i * fb_inf.w]);
 
-				    fb_pixel(fb_inf,j,i,buf32[j + i * fb_inf.w]);
-			        }
 			}
 		}
 	}
@@ -172,7 +161,6 @@ int display_scale(char *filename,int jpeg_w,int jpeg_h,int jpeg_x,int jpeg_y,fb_
 		{
 			fb_pixel(fb_inf, j+jpeg_x, i+jpeg_y,buf32[j + i*fb_inff.w]);
 		}
-
 		usleep(200);
 	}
 	free(buf24);
@@ -181,7 +169,6 @@ int display_scale(char *filename,int jpeg_w,int jpeg_h,int jpeg_x,int jpeg_y,fb_
 
 	return 0;
 }
-
 /*想实现 从图片的一边抽出来的效果 可能思路有问题 pass*/
 int display_jpeg(char *filename, fb_info fb_inf)
 {
@@ -192,17 +179,12 @@ int display_jpeg(char *filename, fb_info fb_inf)
 	u8_t * scale_buf = scale24(buf24, fb_inf, jpeg_inf);
 	u32_t *buf32 = rgb24to32(scale_buf, fb_inf);
 
-	int i, j;
-	for(i = fb_inf.h-1; i > 0 ; i--)
+	int i, j, m, n;
+	for(i = fb_inf.h-1, m = fb_inf.h-1; m > 0; m--, i--)
 	{
-		for (j = 0; j < fb_inf.w ; j++)
+		for (j = 0, n = fb_inf.w-1; j < fb_inf.w || n > 0; n--, j++)
 		{
-                       if(back_main(buf24, scale_buf, buf32, fb_inf) == 1)
-		       {
-		           return 0;
-		       }
-
-         	       fb_pixel(fb_inf, j, i, buf32[j + i * fb_inf.w]);
+			fb_pixel(fb_inf, j, i, buf32[n + m * fb_inf.w]);
 		}
 	}
 
@@ -212,33 +194,6 @@ int display_jpeg(char *filename, fb_info fb_inf)
 	
 	return 0;
 }
-
-int display_menu(char *filename, fb_info fb_inf)
-{
-
-	fb_info jpeg_inf;
-	
-	u8_t *buf24 = decode_jpeg(filename, &jpeg_inf);
-	u8_t * scale_buf = scale24(buf24, fb_inf, jpeg_inf);
-	u32_t *buf32 = rgb24to32(scale_buf, fb_inf);
-
-	int i, j;
-	for(i = fb_inf.h-1; i > 0 ; i--)
-	{
-		for (j = 0; j < fb_inf.w ; j++)
-		{
-         	    fb_pixel(fb_inf, j, i, buf32[j + i * fb_inf.w]);
-		}
-	}
-
-	free(buf24);
-	free(scale_buf);
-	free(buf32);
-	
-	return 0;
-}
-
-
 /*今天刚研究的 随机出现点 哈哈哈*/
 int display_rand(char *filename, fb_info fb_inf)
 {
@@ -252,12 +207,6 @@ int display_rand(char *filename, fb_info fb_inf)
 	{
 		i = rand()%fb_inf.w;
 		j = rand()%fb_inf.h;
-                
-		if (back_main(buf24, scale_buf, buf32, fb_inf) == 1)
-		{
-		    return 0;
-		}
-		
 		fb_pixel(fb_inf, i, j, buf32[i + j * fb_inf.w]);
 	}
 	free(buf24);
@@ -281,12 +230,7 @@ int display_rand_line(char *filename, fb_info fb_inf)
 		i = rand()%fb_inf.h;
 		for (j = 0; j < fb_inf.w; j++)
 		{
-                       if(back_main(buf24, scale_buf, buf32, fb_inf) == 1)
-		       {
-		           return 0;
-		       }
-
-		       fb_pixel(fb_inf, j, i, buf32[j + i * fb_inf.w]);
+			fb_pixel(fb_inf, j, i, buf32[j + i * fb_inf.w]);
 		}
 	}
 
@@ -295,35 +239,4 @@ int display_rand_line(char *filename, fb_info fb_inf)
 	free(buf32);
 	
 	return 0;
-}
-
-/*回到主界面停止运行*/
-int back_main(u8_t *buf24, u8_t *scale_buf, u32_t *buf32, fb_info fb_inf)
-{    
-    while (dis_flag % 2 == 0 && start == 1)
-    {
-	if (restar_flag == 1)
-        {
-            menu(fb_inf);
-
-	    free(buf24);
-	    free(scale_buf);
-	    free(buf32);
-	    
-	    return 1;
-         }
-    }
-
-    if (restar_flag == 1)
-    {
-         menu(fb_inf);
-	 
-	 free(buf24);
-	 free(scale_buf);
-	 free(buf32);
-         
-	 return 1;
-    }
-
-    return 0;
 }
