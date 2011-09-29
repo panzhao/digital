@@ -73,7 +73,7 @@ int display_line(char *filename, fb_info fb_inf)
 	{
 		for (j = 0; j < fb_inf.w; ++j)
 		{       
-                        if (back_main(buf24, scale_buf, buf32, fb_inf) == 1)
+                if (back_main(buf24, scale_buf, buf32, fb_inf) == 1)
 		        {
 		            return 0;
 		        }
