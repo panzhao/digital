@@ -1,6 +1,6 @@
 # 2010.2.22
 
-#DIR = ./out/
+DIR = ./out/
 #TAR_DIR = ./out/
 
 src = $(wildcard *.c)

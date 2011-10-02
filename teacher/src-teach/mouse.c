@@ -1,7 +1,9 @@
-/*
- *  2010.2.25
- *  mouse.c
- */
+/********************************************************************
+文    件:    mouse.c
+功    能:    鼠标功能
+函数列表:
+日    期:
+*********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,141 +12,142 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
-
 #include "common.h"
-
-extern int mouse_open(char *device_name, int *fd);
-extern int mouse_parse(const u8_t *buf, mouse_event_t* mevent);
-extern int fb_restorecursor(fb_info fb_inf, int x, int y);
-extern int fb_drawcursor(fb_info fb_inf, int x, int y);
-extern int test_mouse(fb_info fb_inf);
-
-/* **************** end .h */
 
 #define C_WIDTH  10
 #define C_HEIGHT 17
 #define T___     0XFFFFFFFF
 #define BORD     0x0
 #define X___     0xFFFF
-static unsigned long cursor_pixel[C_WIDTH * C_HEIGHT] = {
-	BORD, T___, T___, T___, T___, T___, T___, T___, T___, T___,
-	BORD, BORD, T___, T___, T___, T___, T___, T___, T___, T___,
-	BORD, X___, BORD, T___, T___, T___, T___, T___, T___, T___,
-	BORD, X___, X___, BORD, T___, T___, T___, T___, T___, T___,
-	BORD, X___, X___, X___, BORD, T___, T___, T___, T___, T___,
-	BORD, X___, X___, X___, X___, BORD, T___, T___, T___, T___,
-	BORD, X___, X___, X___, X___, X___, BORD, T___, T___, T___,
-	BORD, X___, X___, X___, X___, X___, X___, BORD, T___, T___,
-	BORD, X___, X___, X___, X___, X___, X___, X___, BORD, T___,
-	BORD, X___, X___, X___, X___, X___, X___, X___, X___, BORD,
-	BORD, X___, X___, X___, X___, X___, BORD, BORD, BORD, BORD,
-	BORD, X___, X___, BORD, X___, X___, BORD, T___, T___, T___,
-	BORD, X___, BORD, T___, BORD, X___, X___, BORD, T___, T___,
-	BORD, BORD, T___, T___, BORD, X___, X___, BORD, T___, T___,
-	T___, T___, T___, T___, T___, BORD, X___, X___, BORD, T___,
-	T___, T___, T___, T___, T___, BORD, X___, X___, BORD, T___,
-	T___, T___, T___, T___, T___, T___, BORD, BORD, T___, T___
+static unsigned long cursor_pixel[C_WIDTH * C_HEIGHT] = 
+{
+    BORD, T___, T___, T___, T___, T___, T___, T___, T___, T___,
+    BORD, BORD, T___, T___, T___, T___, T___, T___, T___, T___,
+    BORD, X___, BORD, T___, T___, T___, T___, T___, T___, T___,
+    BORD, X___, X___, BORD, T___, T___, T___, T___, T___, T___,
+    BORD, X___, X___, X___, BORD, T___, T___, T___, T___, T___,
+    BORD, X___, X___, X___, X___, BORD, T___, T___, T___, T___,
+    BORD, X___, X___, X___, X___, X___, BORD, T___, T___, T___,
+    BORD, X___, X___, X___, X___, X___, X___, BORD, T___, T___,
+    BORD, X___, X___, X___, X___, X___, X___, X___, BORD, T___,
+    BORD, X___, X___, X___, X___, X___, X___, X___, X___, BORD,
+    BORD, X___, X___, X___, X___, X___, BORD, BORD, BORD, BORD,
+    BORD, X___, X___, BORD, X___, X___, BORD, T___, T___, T___,
+    BORD, X___, BORD, T___, BORD, X___, X___, BORD, T___, T___,
+    BORD, BORD, T___, T___, BORD, X___, X___, BORD, T___, T___,
+    T___, T___, T___, T___, T___, BORD, X___, X___, BORD, T___,
+    T___, T___, T___, T___, T___, BORD, X___, X___, BORD, T___,
+    T___, T___, T___, T___, T___, T___, BORD, BORD, T___, T___
 };
+
 static unsigned long save_cursor[C_WIDTH * C_HEIGHT];
 
+/********************************************************************
+函    数:        test_mouse
+功    能:        测试鼠标的函数
+传入参数:        fb_inf : framebuf的信息
+传出参数:        fb_inf : 写在framebuf中的信息
+返    回:
+特殊说明:	
+********************************************************************/
 int test_mouse(fb_info fb_inf)
 {
-	int mfd;
-	mouse_open(NULL, &mfd);
+    int mfd;
+    mouse_open(NULL, &mfd);
 
-	int m_x = fb_inf.w / 2;
-	int m_y = fb_inf.h / 2;
-	fb_drawcursor(fb_inf, m_x, m_y);
+    int m_x = fb_inf.w / 2;
+    int m_y = fb_inf.h / 2;
+    int mouse = 0;
+    
+    fb_drawcursor(fb_inf, m_x, m_y);
 
-	u8_t buf[8];
-	mouse_event_t mevent;
-	memset(&mevent, 0, sizeof(mevent));
-	int mouse = 0;
+    u8_t buf[8];
+    mouse_event_t mevent;
+    memset(&mevent, 0, sizeof(mevent));
 
-	while (1)
-	{
-		int n = read(mfd, buf, 8);
-		if (n != -1)
-		{
-			mouse_parse(buf,&mevent);
-			fb_restorecursor(fb_inf, m_x, m_y);
-			m_x += mevent.x;
-			m_y += mevent.y;
+    while (1)
+    {
+        int n = read(mfd, buf, 8);
+	if (n != -1)
+        {
+            mouse_parse(buf,&mevent);
+            fb_restorecursor(fb_inf, m_x, m_y);
+            
+	    m_x += mevent.x;
+            m_y += mevent.y;
 			
-#if 1
-			if (m_x >= (fb_inf.w-C_WIDTH))
-			{
-				m_x = fb_inf.w-C_WIDTH;
-			}
-			if(m_y >= (fb_inf.h-C_HEIGHT))
-			{
-				m_y = fb_inf.h-C_HEIGHT;	
-			}
-			if(m_x < 0)
-			{
-				m_x = 0;	
-			}
-			if(m_y < 0)
-			{
-				m_y = 0;	
-			}
-#endif                  
+            if (m_x >= (fb_inf.w-C_WIDTH))
+            {
+                m_x = fb_inf.w-C_WIDTH;
+            }
+            
+	    if (m_y >= (fb_inf.h-C_HEIGHT))
+            {
+                m_y = fb_inf.h-C_HEIGHT;	
+            }
+            
+	    if (m_x < 0)
+            {
+                m_x = 0;	
+            }
+            
+	    if (m_y < 0)
+            {
+                m_y = 0;	
+            }
 
-#if 0
-    			switch (mevent.button)
-			{
-				case 0:
-					if(mouse == 1)
-					{   
-						kill(getppid(), SIGUSR1);
-						mouse = 0;
-					}   
-					if (mouse == 2)
-					{   
-						kill(getppid(), SIGUSR2);
-						mouse = 0;
-					}   
-					if (mouse == 3)
-					{   
-						kill(0,SIGQUIT);
-						mouse = 0;
-					}   
-					break;
-				case 1:mouse = 1;break;
-				case 2:mouse = 2;break;
-				case 3:mouse = 3;break;
-				default:break;
+            switch (mevent.button)
+	    {
+                case 0:
+		{
+                   if (mouse == 1)
+                   {   
+                       kill(getppid(), SIGUSR2);
+                       mouse = 0;
+		   }   
+		   
+		   if (mouse == 2)
+                   {   
+                        kill(getppid(), SIGUSR1);
+                        mouse = 0;
+		   }   
+		   
+		   if (mouse == 3)
+		   {   
+		       kill(0,SIGQUIT);
+		       mouse = 0;
+		   }   
+		   
+	           break;
+	       }	   
+	       
+	       case 1:
+	       {
+	           mouse = 1;
+		   break;
+	       }
 
-			}
-#endif			
-			switch (mevent.button)
-			{
-				case 0:
-					if(mouse == 1)
-					{   
-						kill(getppid(), SIGUSR2);
-						mouse = 0;
-					}   
-					if (mouse == 2)
-					{   
-						kill(getppid(), SIGUSR1);
-						mouse = 0;
-					}   
-					if (mouse == 3)
-					{   
-						kill(0,SIGQUIT);
-						mouse = 0;
-					}   
-					break;
-				case 1:mouse = 1;break;
-				case 2:mouse = 2;break;
-				case 3:mouse = 3;break;
-				default:break;
-
-			}
-			fb_drawcursor(fb_inf, m_x, m_y);
-		}
-	}
+	       case 2:
+	       {    
+	           mouse = 2;
+		   break;
+	       }
+	       
+	       case 3:
+	       {
+	           mouse = 3;
+		   break;
+	       }	   
+	       
+	       default:
+	       {
+	           break;
+               }
+	    }
+	
+	fb_drawcursor(fb_inf, m_x, m_y);
+       }
+    }
 
 	return 0;
 }

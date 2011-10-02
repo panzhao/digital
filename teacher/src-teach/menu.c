@@ -12,7 +12,7 @@ int display_menu(char *, fb_info);
 /*主界面 函数*/
 void menu(fb_info fb_inf)
 {
-	display_menu("1.jpg", fb_inf);
+	display_menu("mei.jpg", fb_inf);
 	
 	if (init_ft("mao.ttf", 0) != 0)
 	{
