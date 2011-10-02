@@ -25,12 +25,11 @@ int start = 0;                /*第一次开始的标志*/
 返    回:
 特殊说明:	
 ********************************************************************/
-void init_restar(fb_info fb_inf)
+void init_restar()
 {
      dis_flag = 0;
      restar_flag = 0;
      start = 0;
-     menu(fb_inf);
 }
 
 /********************************************************************
@@ -44,45 +43,44 @@ void init_restar(fb_info fb_inf)
 void display(fb_info fb_inf)
 {
     display_circle("2.jpg", fb_inf);
-    display_string("暂停", 500, 100, fb_inf, 0xFF0000);
 		
     if (restar_flag == 1)
     {   
-        init_restar(fb_inf);
+        init_restar();
         return;
     }
 
-    sleep(1);
          
     display_rand("3.jpg", fb_inf);
-    display_string("暂停", 500, 100, fb_inf, 0xFF0000);
 		
     if (restar_flag == 1)
     {
-        init_restar(fb_inf);
+        init_restar();
         return;
     }
-		
-    sleep(1);
 	        
     display_line("4.jpg", fb_inf);
-    display_string("暂停", 500, 100, fb_inf, 0xFF0000);
 		
     if (restar_flag == 1)
     {
-        init_restar(fb_inf);
+        init_restar();
         return;
     }
-		
-    sleep(1);
 	        
     display_rand_line("5.jpg", fb_inf);
-    display_string("暂停", 500, 100, fb_inf, 0xFF0000);
 
     if (restar_flag == 1)
     {
-        init_restar(fb_inf);
+        init_restar();
         return;
+    }
+		
+    display_scale_pull("6.jpg", fb_inf);
+
+    if (restar_flag == 1)
+    {
+	init_restar();
+	return;
     }
 		
     sleep(1);

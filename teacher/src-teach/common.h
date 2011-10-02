@@ -48,6 +48,7 @@ extern int display_jpeg(char *filename, fb_info fb_inf);
 extern int display_circle(char *filename, fb_info fb_inf);
 extern int display_line(char *filename, fb_info fb_inf);
 extern int display_scale(char *filename, int a, int b, int c, int d, fb_info fb_inf);
+extern int display_scale_pull(char *filename, fb_info fb_inf);
 extern int display_rand(char *filename, fb_info fb_inf);
 extern int display_rand_line(char *filename, fb_info fb_inf);
 extern int display_dia_line(char *filename, fb_info fb_inf);
@@ -66,6 +67,8 @@ extern int mouse_parse(const u8_t *buf, mouse_event_t* mevent);
 extern int fb_restorecursor(fb_info fb_inf, int x, int y);
 extern int fb_drawcursor(fb_info fb_inf, int x, int y);
 extern int test_mouse(fb_info fb_inf);
+extern void mouse_but(int m_x, int m_y, int *tmp, fb_info fb_inf);
+extern void judge_mouse(int *, int *, fb_info);
 
 /* ******************** disp-basic.c *************** */
 /* create jpeg middle data file */
@@ -83,7 +86,7 @@ extern void menu(fb_info);
 extern int dis_flag;
 extern int restar_flag;
 extern int start;
-extern void init_restar(fb_info);
+extern void init_restar();
 extern void display(fb_info);
 extern int syn_mouse_disp(fb_info);
 extern void sig_handler(int);

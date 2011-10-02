@@ -13,8 +13,7 @@ int main(int argc, const char *argv[])
         
 	return 1;
     }
-    
-    /*同步鼠标和显示*/
+
     syn_mouse_disp(fb_inf);
     
     munmap(fb_inf.fbmem, fb_inf.w * fb_inf.h * fb_inf.bpp / 8);
