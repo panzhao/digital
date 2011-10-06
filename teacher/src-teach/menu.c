@@ -20,8 +20,8 @@ void menu(fb_info fb_inf)
 	    return;
 	}
 	
-	display_string("播放", 100, 100, fb_inf, 0xFF0000);
-	display_string("预览", 100, 200, fb_inf, 0xFF0000);
-	display_string("音乐", 100, 300, fb_inf, 0xFF0000);
-	display_string("推出", 100, 400, fb_inf, 0xFF0000);
+	display_string("播放", fb_inf.w/8, fb_inf.h/5, fb_inf, 0xFF0000);
+	display_string("预览", fb_inf.w/8, fb_inf.h*2/5, fb_inf, 0xFF0000);
+	display_string("音乐", fb_inf.w/8, fb_inf.h*3/5, fb_inf, 0xFF0000);
+	display_string("退出", fb_inf.w/8, fb_inf.h*4/5, fb_inf, 0xFF0000);
 }

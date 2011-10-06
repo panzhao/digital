@@ -1,25 +1,34 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
+
 typedef unsigned char u8_t;
 typedef unsigned short u16_t;
 typedef unsigned int u32_t;
+/*定义一个双向链表存放图片所在文件夹*/
+typedef struct dir
+{
+    char name[100][100];
+    struct dir *pre;
+    struct dir *next;
+}rd_dir;
+
 typedef struct 
 {
-	int w;				  /* width */
-	int h;				  /* high */
-	int bpp;				  /* bits per pixel */
-	u8_t *fbmem;
+    int w;				  /* width */
+    int h;				  /* high */
+    int bpp;				  /* bits per pixel */
+    u8_t *fbmem;
 }fb_info;
 
 /* ********** .h */
 typedef struct 
 {
-	int x;
-	int y;
-	int button;
+    int x;
+    int y;
+    int button;
 }mouse_event_t;
-/* ******************** fb.c ******************** */
 
+/* ******************** fb.c ******************** */
 /* initial framebuf */
 extern int init_fb(fb_info *fb_inf);
 
@@ -27,7 +36,6 @@ extern int init_fb(fb_info *fb_inf);
 extern int fb_pixel(fb_info fb_inf, int x, int y, u32_t color);
 extern int fb_pixel_row(fb_info fb_inf, int x, int y, int len, u32_t color);
 extern int fb_pixel_y(fb_info fb_inf, int x, int y, int len, u32_t color);
-//extern int fb_line(fb_info fb_inf, int x1, int y1, int x2, int y2, u32_t color);
 extern int fb_line(char *filename, fb_info fb_inf, int x1, int y1, int x2, int y2);
 
 /* Framebuffer Test */
@@ -35,22 +43,19 @@ int fb_test(void);
 
 
 /* ******************** jpeg.c ******************** */
-
 /*This returns an array for a 24 bit image.*/
 extern u8_t *decode_jpeg (const char *filename, fb_info *jpeg_inf);
-
 extern u32_t * rgb24to32(u8_t *buf24, fb_info jpeg_inf);
 extern u16_t * rgb24to16(u8_t *buf24, fb_info jpeg_inf);
-
 extern u8_t * scale24(u8_t *buf24, fb_info new_inf, fb_info jpeg_inf);
 
 
 /* ******************** disp_jpeg.c ******************** */
-/* display jpeg */
 extern int display_jpeg(char *filename, fb_info fb_inf);
 extern int display_circle(char *filename, fb_info fb_inf);
 extern int display_line(char *filename, fb_info fb_inf);
 extern int display_scale(char *filename, int a, int b, int c, int d, fb_info fb_inf);
+extern int display_scale_pull(char *filename, fb_info fb_inf);
 extern int display_rand(char *filename, fb_info fb_inf);
 extern int display_rand_line(char *filename, fb_info fb_inf);
 extern int display_dia_line(char *filename, fb_info fb_inf);
@@ -64,10 +69,18 @@ extern int display_string (const char *buf, int x, int y, fb_info fb_inf,u32_t c
 
 /* ******************** mouse.c ******************** */
 extern int test_mouse(fb_info fb_inf);
+extern int mouse_open(char *device_name, int *fd);
+extern int mouse_parse(const u8_t *buf, mouse_event_t* mevent);
+extern int fb_restorecursor(fb_info fb_inf, int x, int y);
+extern int fb_drawcursor(fb_info fb_inf, int x, int y);
+extern int test_mouse(fb_info fb_inf);
+extern void mouse_but(int m_x, int m_y, int *tmp, fb_info fb_inf);
+extern void judge_mouse(int *, int *, fb_info);
 
-/* ******************** disp-basic.c ******************** */
+/* ******************** disp-basic.c *************** */
 /* create jpeg middle data file */
 extern int create_jpeg(const char *filejpeg, const char *newfile, fb_info fb_inf);
+
 /* use middle data file to display */
 extern int basic_disp(const char * filename, fb_info fb_inf);
 
@@ -75,9 +88,22 @@ extern int basic_disp(const char * filename, fb_info fb_inf);
 /* ******************** menu.c ******************** */
 extern void menu(fb_info);
 
-/***********************main.c****************************/
-void sig(int);
+/* ******************** preview.c ******************** */
+extern int previewpicture(fb_info fb_inf);
+
+/***********************my_work.c*********************/
 extern int dis_flag;
 extern int restar_flag;
+extern int pre_flag;
 extern int start;
+extern void init_restar();
+extern void display(fb_info);
+extern int syn_mouse_disp(fb_info);
+extern void sig_handler(int);
+
+/* ******************** minimad.c ******************** */
+extern int music(void);
+
+/***********************readdir.c*********************/
+extern int read_photo(void);
 #endif

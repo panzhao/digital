@@ -1,3 +1,9 @@
+/********************************************************************
+文    件:    fb.c
+功    能:    初始化framebuffer
+函数列表:
+日    期:
+*********************************************************************/
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -14,34 +20,47 @@
 #define DEBUG 0
 #if DEBUG
 #endif
+
+/********************************************************************
+函    数:        init_fb
+功    能:        初始化framebuffer
+传入参数:
+传出参数:
+返    回:
+特殊说明:	
+********************************************************************/
 int init_fb(fb_info *fb_inf)
 {
 	int fd;
 
-	if ((fd = open(FB_DEVICE, O_RDWR)) < 0){
-		fprintf(stderr, "Open %s failed:%s\n", FB_DEVICE, strerror(errno));
-		return -1;
+	if ((fd = open(FB_DEVICE, O_RDWR)) < 0)
+	{
+            fprintf(stderr, "Open %s failed:%s\n", FB_DEVICE, strerror(errno));
+	    return -1;
 	}
 
 	struct fb_var_screeninfo fb_var;
 
-	if (ioctl(fd, FBIOGET_VSCREENINFO, &fb_var) < 0){
-		fprintf(stderr, "fb ioctl failed:%s\n", strerror(errno));
-		return -1;
+	if (ioctl(fd, FBIOGET_VSCREENINFO, &fb_var) < 0)
+	{
+	    fprintf(stderr, "fb ioctl failed:%s\n", strerror(errno));
+	    return -1;
 	}
 
 	fb_inf->w = fb_var.xres;
 	fb_inf->h = fb_var.yres;
 	fb_inf->bpp = fb_var.bits_per_pixel;
-#if 1
+#if 0
 	printf("width:%d\thign:%d\tbpp:%d\n",
 			fb_inf->w, fb_inf->h, fb_inf->bpp);
 #endif	
 	fb_inf->fbmem = mmap(0, fb_inf->w * fb_inf->h * fb_inf->bpp /8,
 			PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	if (fb_inf->fbmem == MAP_FAILED){
-		fprintf(stderr, "fb mmap failed:%s\n", strerror(errno));
-		return -1;
+	
+	if (fb_inf->fbmem == MAP_FAILED)
+	{
+	    fprintf(stderr, "fb mmap failed:%s\n", strerror(errno));
+	    return -1;
 	}
 
 	close(fd);
@@ -53,14 +72,15 @@ int fb_pixel(fb_info fb_inf, int x, int y, u32_t color)
 {
 	u8_t *pos = (u8_t*)fb_inf.fbmem + (fb_inf.w * y + x) * fb_inf.bpp/8;
 
-	switch (fb_inf.bpp){
-		case 32:				  /* 32 bits */
+	switch (fb_inf.bpp)
+	{
+        case 32:				  /* 32 bits */
 			*(pos + 3) = color >> 24;
 		case 24:				  /* 24 bits */
 			*(pos + 2) = color >> 16;
-		case 16:	  		       /* 16 bits */
+		case 16:	  		          /* 16 bits */
 			*(pos + 1) = color >> 8;
-		case 8:			      /* 8 bits */
+		case 8:			                  /* 8 bits */
 			*pos = color;
 			return 0;
 		default:
@@ -77,7 +97,8 @@ void swap(int *a, int *b)
 	*a = *b;
 	*b = temp;
 }
-#if 1 
+#if 0 
+
 /********************************
   函数：fb_line()
   传入参数：起始和终点坐标 及颜色
@@ -85,7 +106,6 @@ void swap(int *a, int *b)
   功能：在屏幕中打印出一条斜线（斜率非1/2）
   返回值：0      
  ********************************/
-//int fb_line(fb_info fb_inf, int x1, int y1, int x2, int y2, u32_t color)     
 int fb_line(char *filename, fb_info fb_inf, int x1, int y1, int x2, int y2)     
 {
 	int dx = x2 - x1;                                      
@@ -106,12 +126,13 @@ int fb_line(char *filename, fb_info fb_inf, int x1, int y1, int x2, int y2)
 			dx = -dx;
 			dy = -dy;
 		}
+		
 		dy = abs(dy);
 		p = 2*dy - dx;                /*画斜线的算法*/
+		
 		while (x1 <= x2)
 		{
 			fb_pixel(fb_inf, x1, y1, buf32[x1, y2*fb_inf.w]);
-			//fb_pixel(fb_inf, x1, y1, color);
 			x1++;
 			if (p < 0)
 			{
@@ -187,23 +208,19 @@ int fb_pixel_row(fb_info fb_inf, int x, int y, int len, u32_t color)
 
 int fb_test(void)
 {
-
 	printf("Framebuffer Test\n");
 
 	fb_info fb_inf;
 	if(init_fb(&fb_inf) < 0)
-		return -1;
+	{
+	    return -1;
+	}
+
 	printf("Framebuffer  Test fb_pixel\n");
 
-	/* point test */
-	//	point_t p, p2; p.x = 640;	p.y = 400;
 	fb_pixel(fb_inf, 640, 400, 0xFFFFFFFF);
 
-	/* line test*/
-	//	p.x = 0; p.y = 200;
-	//	p2.x = 1280, p2.y = 200;
 	fb_pixel_row(fb_inf, 0, 200, 1280, 0xFF0000);
-
 
 	munmap(fb_inf.fbmem, fb_inf.w * fb_inf.h * fb_inf.bpp / 8);
 	return 0;
