@@ -140,7 +140,7 @@ int display_line(char *filename, fb_info fb_inf)
 
 /********************************************************************
   函    数:        display_circle
-  功    能:        按圆显示图片    
+  功    能:        按四个圆显示图片    
   传入参数:        filename : 要显示的图片的名字
 fb_info  :       图片显示的缓存区
 传出参数:        fb_info  : 图片显示的信息
@@ -166,6 +166,7 @@ int display_circle(char *filename, fb_info fb_inf)
         for(i = fb_inf.h/2; i > 0; i--)
         {
             for(j = fb_inf.w/2, z = fb_inf.w/2; j < fb_inf.w || z > 0; j++, z--)	
+
 //            for(j = fb_inf.w/2; j < fb_inf.w; j++)	
             {
                 a = (j - x) * (j - x) + (i - y) * (i - y);
@@ -180,6 +181,7 @@ int display_circle(char *filename, fb_info fb_inf)
                     }
                     fb_pixel(fb_inf,j,i,buf32[j + i * fb_inf.w]);
                     fb_pixel(fb_inf,z,i,buf32[z + i * fb_inf.w]);
+
             //        fb_pixel(fb_inf,fb_inf.w-j-1, i, buf32[fb_inf.w-j-1 + i * fb_inf.w]);
                 }
             }
