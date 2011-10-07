@@ -44,7 +44,7 @@ void init_restar()
  ********************************************************************/
 void display(fb_info fb_inf)
 {
-    display_four("2.jpg", fb_inf);
+    display_circle("2.jpg", fb_inf);
 
     if (restar_flag == 1)
     {   
@@ -102,6 +102,8 @@ int syn_mouse_disp(fb_info fb_inf)
     sigaction(SIGUSR1, &sig_set, NULL);
     sigaction(SIGUSR2, &sig_set, NULL);
     sigaction(SIGALRM, &sig_set, NULL);
+    sigaction(SIGABRT, &sig_set, NULL);
+    sigaction(SIGCONT, &sig_set, NULL);
 
     menu(fb_inf);
 
@@ -181,4 +183,14 @@ void sig_handler(int signo)
     {
         pre_flag = 1;
     }
+	if (signo == SIGABRT)
+	{
+        printf("wwwwwwwwwwwwwwwwwww\n");
+//		sig_number = sig_number-18;
+	}
+	if (signo == SIGCONT)
+	{
+        printf("qqqqqqqqqqqqqqqqqqqq\n");
+		usleep(100);
+	}
 }    

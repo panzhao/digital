@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <math.h>
 #include "common.h"
+
 
 int main(int argc, const char *argv[])
 {

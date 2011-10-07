@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
 #include "common.h"
 
 #define C_WIDTH  10
